@@ -1,0 +1,11 @@
+[Unit]
+Description=Automatically transfer mail to Discord
+
+[Service]
+Type=oneshot
+Environment=MXB_MAIL_SERVER=
+Environment=MXB_MAIL_USER=
+Environment=MXB_MAIL_PASSWORD=
+Environment=MXB_DISCORD_WEBHOOK=
+ExecStart=/opt/autotransfer/autotransfer
+User=kofu
