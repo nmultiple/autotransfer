@@ -1,5 +1,8 @@
 [Unit]
 Description=Automatically transfer mail to Discord
+Documentation=https://github.com/nmultiple/autotransfer
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 Type=oneshot
@@ -8,4 +11,3 @@ Environment=MXB_MAIL_USER=
 Environment=MXB_MAIL_PASSWORD=
 Environment=MXB_DISCORD_WEBHOOK=
 ExecStart=/opt/autotransfer/autotransfer oneshot
-User=kofu
