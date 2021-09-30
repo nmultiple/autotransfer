@@ -1,5 +1,7 @@
 # Auto Transfer (Discord bot)
 
+[![ci](https://github.com/nmultiple/autotransfer/actions/workflows/ci.yml/badge.svg)](https://github.com/nmultiple/autotransfer/actions/workflows/ci.yml)
+
 メールを Discord に送り込む為のボットです。
 Discord の Webhook API を使っています。
 
