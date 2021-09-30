@@ -27,7 +27,11 @@ type Config struct {
 func fetchMailAndPost(cfg Config) {
 	textFilter := filter.New()
 
-	mails := mail.Fetch(cfg.MailServer, cfg.MailUser, cfg.MailPassword)
+	mails, err := mail.Fetch(cfg.MailServer, cfg.MailUser, cfg.MailPassword)
+	if err != nil {
+		log.Println(err)
+	}
+
 	for _, m := range mails {
 		var messageBuilder strings.Builder
 

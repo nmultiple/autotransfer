@@ -1,6 +1,7 @@
 package mail
 
 import (
+	"errors"
 	"io"
 	"log"
 
@@ -17,7 +18,7 @@ type Mail struct {
 	AttachmentCount int
 }
 
-func Fetch(server, user, password string) []Mail {
+func Fetch(server, user, password string) ([]Mail, error) {
 	var mails []Mail
 
 	log.Println("Connecting to server...")
@@ -25,7 +26,7 @@ func Fetch(server, user, password string) []Mail {
 	// Connect to server
 	c, err := client.DialTLS(server, nil)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	log.Println("Connected")
 
@@ -34,7 +35,7 @@ func Fetch(server, user, password string) []Mail {
 
 	// Login
 	if err := c.Login(user, password); err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	log.Println("Logged in")
 
@@ -42,7 +43,7 @@ func Fetch(server, user, password string) []Mail {
 	done := make(chan error, 1)
 	mbox, err := c.Select("Circle", false)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	log.Println("Flags for Circle:", mbox.Flags)
 
@@ -75,18 +76,18 @@ func Fetch(server, user, password string) []Mail {
 			}
 
 			if msg == nil {
-				log.Fatal("Server didn't returned message")
+				return nil, errors.New("Server didn't returned message")
 			}
 
 			r := msg.GetBody(&section)
 			if r == nil {
-				log.Fatal("Server didn't returned message body")
+				return nil, errors.New("Server didn't returned message body")
 			}
 
 			// Create a new mail reader
 			mr, err := mailer.CreateReader(r)
 			if err != nil {
-				log.Fatal(err)
+				return nil, err
 			}
 
 			mail := new(Mail)
@@ -99,7 +100,7 @@ func Fetch(server, user, password string) []Mail {
 				if err == io.EOF {
 					break
 				} else if err != nil {
-					log.Fatal(err)
+					return nil, err
 				}
 
 				switch part.Header.(type) {
@@ -115,11 +116,11 @@ func Fetch(server, user, password string) []Mail {
 		}
 
 		if err := <-done; err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 	}
 
 	log.Println("Mail fetched successfully!")
 
-	return mails
+	return mails, nil
 }
