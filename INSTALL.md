@@ -34,7 +34,7 @@ $ go build .
 $ sudo install -D autotransfer /opt/autotransfer/autotransfer
 ```
 
-`autotransfer.service` を編集し、Webhook の URL やメールサーバの設定を書き込みます。
+`etc/autotransfer.service` を編集し、Webhook の URL やメールサーバの設定を書き込みます。
 `Environment=` で始まる行が編集すべき行です。
 以下がキーごとの説明です。
 
@@ -48,8 +48,8 @@ $ sudo install -D autotransfer /opt/autotransfer/autotransfer
 Systemd の設定ファイルをインストールします。
 
 ```shellsession
-$ sudo install -m 644 autotransfer.service /usr/local/lib/systemd/system/autotransfer.service
-$ sudo install -m 644 autotransfer.timer   /usr/local/lib/systemd/system/autotransfer.timer
+$ sudo install -m 644 etc/autotransfer.service /usr/local/lib/systemd/system/autotransfer.service
+$ sudo install -m 644 etc/autotransfer.timer   /usr/local/lib/systemd/system/autotransfer.timer
 ```
 
 サービスを有効化します。
