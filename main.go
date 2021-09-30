@@ -5,26 +5,29 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
+	"github.com/nmultiple/autotransfer/config"
 	"github.com/nmultiple/autotransfer/discord"
 	"github.com/nmultiple/autotransfer/filter"
 	"github.com/nmultiple/autotransfer/mail"
+
+	"github.com/kelseyhightower/envconfig"
 )
 
-func main() {
-	mailServer := os.Getenv("MXB_MAIL_SERVER")
-	mailUser := os.Getenv("MXB_MAIL_USER")
-	mailPassword := os.Getenv("MXB_MAIL_PASSWORD")
-	discordWebHookUrl := os.Getenv("MXB_DISCORD_WEBHOOK")
+type Config struct {
+	MailServer         string `envconfig:"mxb_mail_server" required:"true"`
+	MailUser           string `envconfig:"mxb_mail_user" required:"true"`
+	MailPassword       string `envconfig:"mxb_mail_password" required:"true"`
+	DiscordWebHookUrl  string `envconfig:"mxb_discord_webhook" required:"true"`
+	FetchIntervalHours int    `envconfig:"mxb_interval_hour" required:"false" default:"3"`
+	OneShot            bool   `ignored:"true"`
+}
 
-	if mailServer == "" || mailUser == "" ||
-		mailPassword == "" || discordWebHookUrl == "" {
-		log.Fatal("Required environment variables not set")
-	}
-
+func fetchMailAndPost(cfg Config) {
 	textFilter := filter.New()
 
-	mails := mail.Fetch(mailServer, mailUser, mailPassword)
+	mails := mail.Fetch(cfg.MailServer, cfg.MailUser, cfg.MailPassword)
 	for _, m := range mails {
 		var messageBuilder strings.Builder
 
@@ -42,8 +45,34 @@ func main() {
 			messageBuilder.WriteString(fmt.Sprintf("%d Attachments.", m.AttachmentCount))
 		}
 
-		if err := discord.SendMessage(text, discordWebHookUrl); err != nil {
+		if err := discord.SendMessage(text, cfg.DiscordWebHookUrl); err != nil {
 			fmt.Println(err)
+		}
+	}
+}
+
+func main() {
+	var cfg Config
+	if err := envconfig.Process("", &cfg); err != nil {
+		if err := config.LoadDotEnv(); err != nil {
+			log.Fatal("Failed to load config:", err)
+		}
+
+		if err := envconfig.Process("", &cfg); err != nil {
+			log.Fatal("Failed to load config (tried .env):", err)
+		}
+	}
+
+	if len(os.Args) > 1 && os.Args[1] == "oneshot" {
+		cfg.OneShot = true
+	}
+
+	if cfg.OneShot {
+		fetchMailAndPost(cfg)
+	} else {
+		for {
+			fetchMailAndPost(cfg)
+			time.Sleep(time.Hour * time.Duration(cfg.FetchIntervalHours))
 		}
 	}
 }

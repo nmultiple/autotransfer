@@ -4,6 +4,10 @@ GO = go
 all:
 	$(GO) build .
 
+.PHONY: run
+run: all
+	./autotransfer
+
 .PHONY: test
 test:
 	$(GO) test ./...
