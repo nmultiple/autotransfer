@@ -27,6 +27,13 @@ func TestParseLine(t *testing.T) {
 			expectValue: "bar=baz",
 		},
 		{
+			name: "empty",
+			line: "=",
+			expectError: nil,
+			expectKey: "",
+			expectValue: "",
+		},
+		{
 			name: "indented",
 			line: "    foo=bar",
 			expectError: nil,
@@ -47,16 +54,6 @@ func TestParseLine(t *testing.T) {
 		},
 		{
 			name: "only space",
-			line: " ",
-			expectError: EmptyLine,
-		},
-		{
-			name: "only tab",
-			line: " ",
-			expectError: EmptyLine,
-		},
-		{
-			name: "only tab",
 			line: " ",
 			expectError: EmptyLine,
 		},
