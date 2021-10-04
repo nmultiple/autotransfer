@@ -2,7 +2,7 @@ package filter
 
 import "regexp"
 
-var unneededHeaderRegexp = regexp.MustCompile("^学生団体[ 　]?各位$")
+var unneededHeaderRegexp = regexp.MustCompile("^(全学)?学生団体[ 　]?各位$")
 
 func filterHeader(lines []string) []string {
 	if len(lines) < 2 {

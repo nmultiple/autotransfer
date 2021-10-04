@@ -106,3 +106,22 @@ func TestFilterHeader6(t *testing.T) {
 		t.Fatalf("Unexpected content: %s\n", result[0])
 	}
 }
+
+func TestFilterHeader7(t *testing.T) {
+	msg := []string{
+		"全学学生団体各位",
+		"",
+		"ほげほげ",
+	}
+
+	result := filterHeader(msg)
+	if len(result) != 2 {
+		t.Fatalf("Unexpected length: %d\n", len(result))
+	}
+	if result[0] != "" {
+		t.Fatalf("Unexpected content: %s\n", result[0])
+	}
+	if result[1] != "ほげほげ" {
+		t.Fatalf("Unexpected content: %s\n", result[1])
+	}
+}
